@@ -1,129 +1,624 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1120">
+<title>TradeMind AI | Smart Market Analysis</title>
 
-  <title>TradeMind AI</title>
+<style>
+* {
+  box-sizing: border-box;
+}
 
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #0b1120;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
-    }
+body {
+  margin: 0;
+  padding: 20px;
+  background: #0b1120;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
 
-    header {
-      text-align: center;
-      padding: 20px 0;
-    }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 25px;
+}
 
-    header h1 {
-      color: #35d39a;
-      font-size: 30px;
-    }
+.logo {
+  font-size: 25px;
+  font-weight: bold;
+  color: #38bdf8;
+}
 
-    .subtitle {
-      color: #aab5c8;
-    }
+.logo span {
+  color: #ffffff;
+}
 
-    .card {
-      background: #172238;
-      padding: 20px;
-      border-radius: 14px;
-      margin: 18px 0;
-      border: 1px solid #293750;
-    }
+.badge {
+  background: #123b32;
+  color: #4ade80;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
 
-    .card h2 {
-      color: #35d39a;
-    }
+.hero {
+  background: linear-gradient(135deg, #162746, #102c3b);
+  border: 1px solid #263b59;
+  border-radius: 18px;
+  padding: 25px;
+  margin-bottom: 22px;
+}
 
-    .button {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      background: #35d39a;
-      color: #07140f;
-      font-size: 16px;
-      font-weight: bold;
-      margin-top: 15px;
-    }
+.hero h1 {
+  font-size: 29px;
+  margin: 0 0 12px;
+}
 
-    .muted {
-      color: #aab5c8;
-      line-height: 1.6;
-    }
+.hero p {
+  color: #b8c7dc;
+  line-height: 1.7;
+}
 
-    footer {
-      color: #aab5c8;
-      font-size: 12px;
-      text-align: center;
-      margin: 30px 0 10px;
-    }
-  </style>
+button, select, input {
+  font: inherit;
+}
+
+button {
+  border: none;
+  background: #38bdf8;
+  color: #07111f;
+  font-weight: bold;
+  padding: 12px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+.section-title {
+  margin: 26px 0 15px;
+  font-size: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  background: #141e30;
+  border: 1px solid #26344b;
+  padding: 17px;
+  border-radius: 14px;
+  min-width: 0;
+}
+
+.card h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #a8bad2;
+}
+
+.price {
+  font-size: 21px;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.green {
+  color: #4ade80;
+}
+
+.red {
+  color: #fb7185;
+}
+
+.blue {
+  color: #38bdf8;
+}
+
+.status {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 9px;
+  background: #0b1526;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+label {
+  display: block;
+  margin: 14px 0 7px;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #34445c;
+  background: #0b1526;
+  color: #ffffff;
+  outline: none;
+}
+
+.result {
+  margin-top: 16px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #0b1526;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.warning {
+  margin-top: 25px;
+  border: 1px solid #7c5b25;
+  background: #302515;
+  color: #fcd98a;
+  padding: 16px;
+  border-radius: 12px;
+  line-height: 1.7;
+  font-size: 13px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px 0;
+  border-top: 1px solid #26344b;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 13px;
+  }
+
+  .hero {
+    padding: 19px;
+  }
+
+  .hero h1 {
+    font-size: 25px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <h1>TradeMind AI</h1>
-    <p class="subtitle">Smarter Market Research Starts Here</p>
-  </header>
+<header>
+  <div class="logo">TradeMind <span>AI</span></div>
+  <div class="badge">● MARKET MONITOR</div>
+</header>
 
-  <section class="card">
-    <h2>Welcome</h2>
-    <p>
-      Explore cryptocurrency markets, understand trading indicators,
-      and learn how to manage risk.
-    </p>
-  </section>
+<section class="hero">
+  <h1>Trade Smarter With Data.</h1>
+  <p>
+    Monitor cryptocurrency markets, study technical indicators,
+    identify potential trading setups and calculate risk before
+    making a trading decision.
+  </p>
+  <button onclick="refreshMarkets()">Refresh Market Data ↻</button>
+  <div id="connection" class="status">
+    Connecting to market data...
+  </div>
+</section>
 
-  <section class="card">
-    <h2>Market Analysis</h2>
+<h2 class="section-title">Live Crypto Market</h2>
+
+<div class="grid" id="marketGrid">
+  <div class="card">
+    <h3>BTC / USDT</h3>
+    <div class="price">Loading...</div>
+  </div>
+</div>
+
+<h2 class="section-title">AI-Assisted Market Analysis</h2>
+
+<div class="card">
+  <h3>Technical Analysis Engine</h3>
+
+  <label for="coinSelect">Select cryptocurrency</label>
+  <select id="coinSelect" onchange="analyzeCoin()">
+    <option value="BTCUSDT">Bitcoin (BTC)</option>
+    <option value="ETHUSDT">Ethereum (ETH)</option>
+    <option value="SOLUSDT">Solana (SOL)</option>
+    <option value="BNBUSDT">BNB</option>
+    <option value="XRPUSDT">XRP</option>
+    <option value="DOGEUSDT">Dogecoin (DOGE)</option>
+  </select>
+
+  <div id="analysisResult" class="result">
+    Loading technical indicators...
+  </div>
+
+  <p class="muted">
+    Analysis uses simple moving averages and RSI. These are
+    technical indicators, not a trained AI model. Signals may
+    be wrong and should not be treated as financial advice.
+  </p>
+</div>
+
+<h2 class="section-title">Risk Management Calculator</h2>
+
+<div class="card">
+  <h3>Calculate Your Potential Trade Risk</h3>
+
+  <label for="capital">Account balance (USDT)</label>
+  <input id="capital" type="number" value="100" min="0"
+    step="any">
+
+  <label for="riskPercent">Risk per trade (%)</label>
+  <input id="riskPercent" type="number" value="1" min="0.01"
+    max="100" step="any">
+
+  <label for="entry">Entry price (USDT)</label>
+  <input id="entry" type="number" value="100" min="0"
+    step="any">
+
+  <label for="stop">Stop-loss price (USDT)</label>
+  <input id="stop" type="number" value="98" min="0"
+    step="any">
+
+  <label for="target">Take-profit price (USDT)</label>
+  <input id="target" type="number" value="104" min="0"
+    step="any">
+
+  <label for="direction">Trade direction</label>
+  <select id="direction">
+    <option value="long">Long / Buy</option>
+    <option value="short">Short / Sell</option>
+  </select>
+
+  <button onclick="calculateRisk()">Calculate Risk</button>
+
+  <div id="riskResult" class="result">
+    Enter your trade details and calculate your risk.
+  </div>
+</div>
+
+<h2 class="section-title">Platform Features</h2>
+
+<div class="grid">
+  <div class="card">
+    <h3>📊 Market Data</h3>
     <p class="muted">
-      Our market analysis dashboard is under development.
-      Live prices and analysis will be added in a later stage.
+      View current cryptocurrency prices and 24-hour changes.
     </p>
-    <button class="button" onclick="showStatus()">
-      Check Platform Status
-    </button>
-    <p id="status" class="muted"></p>
-  </section>
+  </div>
 
-  <section class="card">
-    <h2>Risk Management</h2>
+  <div class="card">
+    <h3>🤖 Technical Signals</h3>
     <p class="muted">
-      Every trade carries risk. Learn to evaluate potential losses,
-      position sizes, stop-loss levels, and market uncertainty.
+      Compare moving averages and RSI to study market momentum.
     </p>
-  </section>
+  </div>
 
-  <section class="card">
-    <h2>Coming Soon</h2>
+  <div class="card">
+    <h3>🛡️ Risk Control</h3>
     <p class="muted">
-      Cryptocurrency prices, technical indicators,
-      AI-assisted market research, and a trading dashboard.
+      Estimate position size, potential losses and reward-to-risk.
     </p>
-  </section>
+  </div>
 
-  <footer>
-    TradeMind AI | Market Research and Education
-    <br><br>
-    Trading involves risk. Profits are not guaranteed.
-  </footer>
+  <div class="card">
+    <h3>🚀 Future Development</h3>
+    <p class="muted">
+      Planned upgrades include a secure backend, trained AI models,
+      historical backtesting and user accounts.
+    </p>
+  </div>
+</div>
 
-  <script>
-    function showStatus() {
-      document.getElementById("status").textContent =
-        "TradeMind AI is running. Market data integration is the next step.";
+<div class="warning">
+  <strong>Risk Warning</strong><br>
+  Cryptocurrency trading can result in the loss of your capital.
+  Market prices and technical indicators are not guarantees of
+  future performance. This website does not execute trades.
+  Always independently verify market information before acting.
+</div>
+
+<footer>
+  <strong>TradeMind AI</strong><br>
+  Intelligent Market Analysis & Risk Management<br>
+  © 2026 TradeMind AI. All rights reserved.
+</footer>
+
+<script>
+const coins = [
+  {symbol: "BTCUSDT", name: "Bitcoin", short: "BTC"},
+  {symbol: "ETHUSDT", name: "Ethereum", short: "ETH"},
+  {symbol: "SOLUSDT", name: "Solana", short: "SOL"},
+  {symbol: "BNBUSDT", name: "BNB", short: "BNB"},
+  {symbol: "XRPUSDT", name: "XRP", short: "XRP"},
+  {symbol: "DOGEUSDT", name: "Dogecoin", short: "DOGE"}
+];
+
+const marketData = {};
+
+function money(value) {
+  if (!Number.isFinite(value)) return "N/A";
+
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: value < 1 ? 6 : 2
+  });
+}
+
+async function getJSON(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Market data request failed.");
+  }
+
+  return response.json();
+}
+
+async function refreshMarkets() {
+  const connection = document.getElementById("connection");
+
+  connection.textContent = "Updating market prices...";
+
+  try {
+    const symbols = coins.map(c => c.symbol);
+
+    const results = await Promise.all(
+      symbols.map(async symbol => {
+        const data = await getJSON(
+          "https://api.binance.com/api/v3/ticker/24hr?symbol="
+          + symbol
+        );
+
+        return data;
+      })
+    );
+
+    results.forEach(data => {
+      marketData[data.symbol] = data;
+    });
+
+    renderMarkets();
+
+    connection.textContent =
+      "Market data connected. Last updated: "
+      + new Date().toLocaleTimeString();
+
+    analyzeCoin();
+
+  } catch (error) {
+    connection.textContent =
+      "Unable to load live market data. Check your internet "
+      + "connection or try again later. " + error.message;
+  }
+}
+
+function renderMarkets() {
+  const grid = document.getElementById("marketGrid");
+
+  grid.innerHTML = coins.map(coin => {
+    const data = marketData[coin.symbol];
+
+    if (!data) {
+      return `
+        <div class="card">
+          <h3>${coin.name} (${coin.short})</h3>
+          <div class="price">Unavailable</div>
+        </div>
+      `;
     }
-  </script>
+
+    const change = Number(data.priceChangePercent);
+    const color = change >= 0 ? "green" : "red";
+
+    return `
+      <div class="card">
+        <h3>${coin.name} (${coin.short})</h3>
+        <div class="price">$${money(Number(data.lastPrice))}</div>
+        <p class="${color}">
+          ${change >= 0 ? "+" : ""}${change.toFixed(2)}%
+        </p>
+        <p class="muted">
+          24h volume: ${money(Number(data.volume))}
+          ${coin.short}
+        </p>
+      </div>
+    `;
+  }).join("");
+}
+
+function sma(values, period) {
+  if (values.length < period) return null;
+
+  const recent = values.slice(-period);
+
+  return recent.reduce((sum, value) => sum + value, 0)
+    / period;
+}
+
+function rsi(values, period = 14) {
+  if (values.length <= period) return null;
+
+  let gains = 0;
+  let losses = 0;
+
+  for (let i = values.length - period; i < values.length; i++) {
+    const difference = values[i] - values[i - 1];
+
+    if (difference > 0) {
+      gains += difference;
+    } else {
+      losses += Math.abs(difference);
+    }
+  }
+
+  const averageGain = gains / period;
+  const averageLoss = losses / period;
+
+  if (averageLoss === 0) {
+    return averageGain === 0 ? 50 : 100;
+  }
+
+  const relativeStrength = averageGain / averageLoss;
+
+  return 100 - (100 / (1 + relativeStrength));
+}
+
+async function analyzeCoin() {
+  const symbol = document.getElementById("coinSelect").value;
+  const output = document.getElementById("analysisResult");
+
+  output.textContent = "Calculating indicators...";
+
+  try {
+    const candles = await getJSON(
+      "https://api.binance.com/api/v3/klines?symbol="
+      + symbol + "&interval=1h&limit=60"
+    );
+
+    const closes = candles.map(c => Number(c[4]));
+
+    const current = closes[closes.length - 1];
+    const fastSMA = sma(closes, 20);
+    const slowSMA = sma(closes, 50);
+    const currentRSI = rsi(closes, 14);
+
+    let bias = "Mixed / Neutral";
+    let biasClass = "blue";
+
+    if (fastSMA > slowSMA && current > fastSMA) {
+      bias = "Bullish trend conditions";
+      biasClass = "green";
+    } else if (fastSMA < slowSMA && current < fastSMA) {
+      bias = "Bearish trend conditions";
+      biasClass = "red";
+    }
+
+    let momentum = "Neutral momentum";
+
+    if (currentRSI >= 70) {
+      momentum = "RSI indicates potentially overbought conditions";
+    } else if (currentRSI <= 30) {
+      momentum = "RSI indicates potentially oversold conditions";
+    }
+
+    output.innerHTML = `
+      <strong>Price:</strong> $${money(current)}<br>
+      <strong>SMA 20:</strong> $${money(fastSMA)}<br>
+      <strong>SMA 50:</strong> $${money(slowSMA)}<br>
+      <strong>RSI 14:</strong> ${currentRSI.toFixed(2)}<br>
+      <strong>Trend assessment:</strong>
+      <span class="${biasClass}">${bias}</span><br>
+      <strong>Momentum:</strong> ${momentum}<br>
+      <strong>Timeframe:</strong> 1-hour candles
+    `;
+
+  } catch (error) {
+    output.textContent =
+      "Analysis unavailable. Check your connection and retry. "
+      + error.message;
+  }
+}
+
+function calculateRisk() {
+  const capital = Number(document.getElementById("capital").value);
+  const riskPercent = Number(
+    document.getElementById("riskPercent").value
+  );
+  const entry = Number(document.getElementById("entry").value);
+  const stop = Number(document.getElementById("stop").value);
+  const target = Number(document.getElementById("target").value);
+  const direction = document.getElementById("direction").value;
+
+  const output = document.getElementById("riskResult");
+
+  if (
+    !Number.isFinite(capital) ||
+    !Number.isFinite(riskPercent) ||
+    !Number.isFinite(entry) ||
+    !Number.isFinite(stop) ||
+    !Number.isFinite(target) ||
+    capital <= 0 ||
+    riskPercent <= 0 ||
+    riskPercent > 100 ||
+    entry <= 0 ||
+    stop <= 0 ||
+    target <= 0
+  ) {
+    output.textContent =
+      "Enter valid positive numbers. Risk must be between "
+      + "0 and 100 percent.";
+    return;
+  }
+
+  const valid = direction === "long"
+    ? stop < entry && target > entry
+    : stop > entry && target < entry;
+
+  if (!valid) {
+    output.textContent =
+      "Invalid prices for this trade direction. For a long "
+      + "trade, stop-loss must be below entry and target above "
+      + "entry. For a short trade, the reverse applies.";
+    return;
+  }
+
+  const riskAmount = capital * riskPercent / 100;
+  const riskPerUnit = Math.abs(entry - stop);
+  const rewardPerUnit = Math.abs(target - entry);
+  const quantity = riskAmount / riskPerUnit;
+  const positionValue = quantity * entry;
+  const potentialProfit = quantity * rewardPerUnit;
+  const ratio = rewardPerUnit / riskPerUnit;
+
+  output.innerHTML = `
+    <strong>Maximum planned loss:</strong>
+    $${money(riskAmount)} USDT<br>
+    <strong>Position quantity:</strong>
+    ${quantity.toFixed(6)} units<br>
+    <strong>Position value:</strong>
+    $${money(positionValue)} USDT<br>
+    <strong>Potential profit at target:</strong>
+    $${money(potentialProfit)} USDT<br>
+    <strong>Reward-to-risk ratio:</strong>
+    1:${ratio.toFixed(2)}<br>
+    <span class="muted">
+      Excludes trading fees, slippage, leverage effects and
+      funding costs. Position value may exceed your balance.
+      Actual losses may exceed the planned risk.
+    </span>
+  `;
+}
+
+refreshMarkets();
+
+setInterval(refreshMarkets, 60000);
+</script>
 
 </body>
 </html>
