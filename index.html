@@ -687,5 +687,158 @@ async function loadCryptoPrices() {
 
 loadCryptoPrices();
 </script>
-</body>
+<!-- TRADEMIND AI PROFESSIONAL TRADING DASHBOARD -->
+
+<section id="trademind-pro" style="
+  background:#0b1120;
+  color:#ffffff;
+  padding:20px;
+  margin:20px 0;
+  border-radius:15px;
+  font-family:Arial,sans-serif;
+">
+
+  <h2 style="color:#38bdf8;">
+    TradeMind AI Pro
+  </h2>
+
+  <p style="color:#aab6cc;">
+    Interactive Crypto Charts & Technical Analysis
+  </p>
+
+  <div style="
+    background:#111c30;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+  ">
+    <label for="tm-symbol">
+      Select Cryptocurrency:
+    </label>
+
+    <select id="tm-symbol" onchange="changeTMChart()"
+      style="
+        display:block;
+        width:100%;
+        padding:12px;
+        margin-top:10px;
+        background:#1e293b;
+        color:white;
+        border:1px solid #334155;
+        border-radius:6px;
+      ">
+
+      <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
+      <option value="BINANCE:ETHUSDT">Ethereum (ETH)</option>
+      <option value="BINANCE:BNBUSDT">BNB</option>
+      <option value="BINANCE:SOLUSDT">Solana (SOL)</option>
+      <option value="BINANCE:XRPUSDT">XRP</option>
+
+    </select>
+  </div>
+
+  <div style="
+    background:#111c30;
+    padding:12px;
+    border-radius:10px;
+  ">
+
+    <h3 style="color:#38bdf8;">
+      Live Market Chart
+    </h3>
+
+    <p style="color:#aab6cc;font-size:13px;">
+      Use the chart controls to change timeframes,
+      zoom, and examine market movements.
+    </p>
+
+    <div id="tm-tradingview-chart"
+      style="height:500px;width:100%;">
+    </div>
+
+  </div>
+
+  <div style="
+    background:#111c30;
+    padding:15px;
+    border-radius:10px;
+    margin-top:15px;
+  ">
+
+    <h3>Technical Indicators</h3>
+
+    <ul style="line-height:2;color:#dbeafe;">
+      <li>RSI — Relative Strength Index</li>
+      <li>MACD — Moving Average Convergence Divergence</li>
+      <li>Moving averages — Trend analysis</li>
+    </ul>
+
+    <p style="color:#fbbf24;font-size:13px;">
+      Indicators help analyze market conditions.
+      They do not guarantee profitable trades.
+    </p>
+
+  </div>
+
+</section>
+
+<script>
+(function () {
+
+  const symbolSelect = document.getElementById("tm-symbol");
+  const chartContainer = document.getElementById("tm-tradingview-chart");
+
+  window.changeTMChart = function () {
+
+    const symbol = symbolSelect.value;
+
+    chartContainer.innerHTML = "";
+
+    const container = document.createElement("div");
+    container.className = "tradingview-widget-container";
+    container.style.height = "100%";
+    container.style.width = "100%";
+
+    const widget = document.createElement("div");
+    widget.className = "tradingview-widget-container__widget";
+    widget.style.height = "100%";
+    widget.style.width = "100%";
+
+    container.appendChild(widget);
+    chartContainer.appendChild(container);
+
+    const script = document.createElement("script");
+
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+
+    script.async = true;
+
+    script.innerHTML = JSON.stringify({
+      autosize: true,
+      symbol: symbol,
+      interval: "60",
+      timezone: "Etc/UTC",
+      theme: "dark",
+      style: "1",
+      locale: "en",
+      allow_symbol_change: true,
+      calendar: false,
+      support_host: "https://www.tradingview.com",
+      studies: [
+        "STD;RSI",
+        "STD;MACD",
+        "STD;Moving Average"
+      ]
+    });
+
+    container.appendChild(script);
+  };
+
+  window.changeTMChart();
+
+})();
+</script>
+
+<!-- END TRADEMIND AI PROFESSIONAL DASHBOARD -->/body>
 </html>
