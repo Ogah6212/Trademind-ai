@@ -840,5 +840,255 @@ loadCryptoPrices();
 })();
 </script>
 
-<!-- END TRADEMIND AI PROFESSIONAL DASHBOARD -->/body>
+<!-- END TRADEMIND AI PROFESSIONAL DASHBOARD -->/<!-- TRADEMIND AI SIGNAL ENGINE -->
+<section id="tm-signal-engine" style="
+  background:#0b1120;
+  color:white;
+  padding:20px;
+  margin:20px 0;
+  border-radius:15px;
+  font-family:Arial,sans-serif;
+">
+  <h2 style="color:#38bdf8;">TradeMind AI Signal Engine</h2>
+
+  <p style="color:#aab6cc;">
+    Rule-based technical analysis using public market data.
+  </p>
+
+  <label for="tm-signal-coin">Cryptocurrency</label>
+
+  <select id="tm-signal-coin" style="
+    display:block;width:100%;padding:12px;margin:10px 0;
+    background:#1e293b;color:white;border-radius:6px;
+  ">
+    <option value="BTCUSDT">Bitcoin (BTC)</option>
+    <option value="ETHUSDT">Ethereum (ETH)</option>
+    <option value="BNBUSDT">BNB</option>
+    <option value="SOLUSDT">Solana (SOL)</option>
+    <option value="XRPUSDT">XRP</option>
+  </select>
+
+  <label for="tm-signal-interval">Chart timeframe</label>
+
+  <select id="tm-signal-interval" style="
+    display:block;width:100%;padding:12px;margin:10px 0;
+    background:#1e293b;color:white;border-radius:6px;
+  ">
+    <option value="15m">15 minutes</option>
+    <option value="1h" selected>1 hour</option>
+    <option value="4h">4 hours</option>
+    <option value="1d">1 day</option>
+  </select>
+
+  <button id="tm-analyze-button" style="
+    width:100%;padding:13px;background:#0284c7;
+    color:white;border:0;border-radius:7px;font-weight:bold;
+  ">Analyze Market</button>
+
+  <div id="tm-signal-results" aria-live="polite" style="
+    margin-top:18px;background:#111c30;padding:15px;border-radius:10px;
+  ">
+    Select a market and tap Analyze Market.
+  </div>
+
+  <p style="font-size:12px;color:#aab6cc;margin-top:15px;">
+    Signals are experimental technical-analysis outputs, not financial advice.
+    They do not guarantee profitable trades.
+  </p>
+</section>
+
+<script>
+(function () {
+  const coinSelect = document.getElementById("tm-signal-coin");
+  const intervalSelect = document.getElementById("tm-signal-interval");
+  const button = document.getElementById("tm-analyze-button");
+  const results = document.getElementById("tm-signal-results");
+
+  if (!coinSelect || !intervalSelect || !button || !results) return;
+
+  function ema(values, period) {
+    const k = 2 / (period + 1);
+    let current = values[0];
+    const output = [current];
+
+    for (let i = 1; i < values.length; i++) {
+      current = values[i] * k + current * (1 - k);
+      output.push(current);
+    }
+
+    return output;
+  }
+
+  function rsi(values, period = 14) {
+    if (values.length <= period) return null;
+
+    let gains = 0;
+    let losses = 0;
+
+    for (let i = 1; i <= period; i++) {
+      const difference = values[i] - values[i - 1];
+      gains += Math.max(difference, 0);
+      losses += Math.max(-difference, 0);
+    }
+
+    let avgGain = gains / period;
+    let avgLoss = losses / period;
+
+    for (let i = period + 1; i < values.length; i++) {
+      const difference = values[i] - values[i - 1];
+
+      avgGain = (avgGain * (period - 1) +
+        Math.max(difference, 0)) / period;
+
+      avgLoss = (avgLoss * (period - 1) +
+        Math.max(-difference, 0)) / period;
+    }
+
+    if (avgLoss === 0) return avgGain === 0 ? 50 : 100;
+
+    return 100 - 100 / (1 + avgGain / avgLoss);
+  }
+
+  function money(value) {
+    return Number(value).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 8
+    });
+  }
+
+  async function analyze() {
+    button.disabled = true;
+    results.textContent = "Downloading market data and calculating indicators...";
+
+    try {
+      const symbol = coinSelect.value;
+      const interval = intervalSelect.value;
+
+      const url =
+        "https://api.binance.com/api/v3/klines?symbol=" +
+        encodeURIComponent(symbol) +
+        "&interval=" + encodeURIComponent(interval) +
+        "&limit=200";
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(
+          "Market data unavailable (HTTP " + response.status + ")."
+        );
+      }
+
+      const candles = await response.json();
+
+      if (!Array.isArray(candles) || candles.length < 60) {
+        throw new Error("Not enough historical candles to analyze.");
+      }
+
+      // Exclude the newest candle because it may still be forming.
+      const closedCandles = candles.slice(0, -1);
+      const closes = closedCandles.map(c => Number(c[4]));
+      const highs = closedCandles.map(c => Number(c[2]));
+      const lows = closedCandles.map(c => Number(c[3]));
+
+      if (closes.some(v => !Number.isFinite(v) || v <= 0)) {
+        throw new Error("Market data contained invalid prices.");
+      }
+
+      const price = closes[closes.length - 1];
+      const rsiValue = rsi(closes, 14);
+
+      const ema12 = ema(closes, 12);
+      const ema26 = ema(closes, 26);
+
+      const macdLine = closes.map((_, i) => ema12[i] - ema26[i]);
+      const signalLine = ema(macdLine.slice(25), 9);
+      const macdValue = macdLine[macdLine.length - 1];
+      const macdSignal = signalLine[signalLine.length - 1];
+
+      const ema20 = ema(closes, 20).at(-1);
+      const ema50 = ema(closes, 50).at(-1);
+
+      const bullish = [];
+      const bearish = [];
+
+      if (rsiValue >= 50 && rsiValue < 70) bullish.push("RSI");
+      if (rsiValue < 50 && rsiValue > 30) bearish.push("RSI");
+
+      if (macdValue > macdSignal) bullish.push("MACD");
+      if (macdValue < macdSignal) bearish.push("MACD");
+
+      if (ema20 > ema50) bullish.push("EMA trend");
+      if (ema20 < ema50) bearish.push("EMA trend");
+
+      let signal = "NEUTRAL";
+
+      if (bullish.length === 3) signal = "BUY";
+      if (bearish.length === 3) signal = "SELL";
+
+      // Illustrative levels based on recent candle extremes.
+      const recentHigh = Math.max(...highs.slice(-14));
+      const recentLow = Math.min(...lows.slice(-14));
+
+      let stopLoss = null;
+      let takeProfit = null;
+
+      if (signal === "BUY" && recentLow < price) {
+        stopLoss = recentLow;
+        takeProfit = price + 2 * (price - stopLoss);
+      } else if (signal === "SELL" && recentHigh > price) {
+        stopLoss = recentHigh;
+        takeProfit = price - 2 * (stopLoss - price);
+      }
+
+      results.innerHTML = `
+        <h3 style="color:#38bdf8;">Analysis Results</h3>
+
+        <p><b>Market:</b> ${symbol}</p>
+        <p><b>Timeframe:</b> ${interval}</p>
+        <p><b>Latest closed price:</b> $${money(price)}</p>
+
+        <p><b>RSI (14):</b> ${rsiValue.toFixed(2)}</p>
+        <p><b>MACD:</b> ${macdValue.toPrecision(7)}</p>
+        <p><b>MACD signal line:</b> ${macdSignal.toPrecision(7)}</p>
+        <p><b>EMA (20):</b> $${money(ema20)}</p>
+        <p><b>EMA (50):</b> $${money(ema50)}</p>
+
+        <hr style="border-color:#334155;">
+
+        <h3 style="color:${
+          signal === "BUY" ? "#4ade80" :
+          signal === "SELL" ? "#f87171" : "#fbbf24"
+        };">Signal: ${signal}</h3>
+
+        <p>Bullish conditions: ${bullish.length}/3</p>
+        <p>Bearish conditions: ${bearish.length}/3</p>
+
+        <p><b>Illustrative stop-loss:</b> ${
+          stopLoss === null ? "Not generated" : "$" + money(stopLoss)
+        }</p>
+
+        <p><b>Illustrative take-profit:</b> ${
+          takeProfit === null ? "Not generated" : "$" + money(takeProfit)
+        }</p>
+
+        <p style="font-size:12px;color:#aab6cc;">
+          Data source: Binance public market-data API.
+          Analysis uses completed candles; prices can change.
+          Levels do not account for fees, slippage, or your account size.
+          This signal has not been validated as a profitable strategy.
+        </p>
+      `;
+
+    } catch (error) {
+      results.textContent =
+        error.message || "Unable to analyze this market. Please try again.";
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  button.addEventListener("click", analyze);
+})();
+</script>
+<!-- END TRADEMIND AI SIGNAL ENGINE -->body>
 </html>
