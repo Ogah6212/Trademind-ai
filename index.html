@@ -1218,27 +1218,82 @@ loadCryptoPrices();
       }
 
       const url =
-        "https://api.binance.com/api/v3/klines?symbol=" +
-        encodeURIComponent(symbol.value) +
-        "&interval=" + encodeURIComponent(interval.value) +
-        "&limit=1000";
+             // Use Coinbase for historical market data.
+      const productMap = {
+        BTCUSDT: "BTC-USD",
+        ETHUSDT: "ETH-USD",
+        SOLUSDT: "SOL-USD",
+        XRPUSDT: "XRP-USD"
+      };
+
+      const product = productMap[symbol.value];
+
+      if (!product) {
+        throw new Error(
+          "This trading pair is not supported by the Coinbase data source. Try BTC, ETH, SOL, or XRP."
+        );
+      }
+
+      const granularityMap = {
+        "1m": 60,
+        "5m": 300,
+        "15m": 900,
+        "1h": 3600,
+        "6h": 21600,
+        "1d": 86400
+      };
+
+      const granularity = granularityMap[interval.value];
+
+      if (!granularity) {
+        throw new Error(
+          "This timeframe is not supported by Coinbase. Select 1m, 5m, 15m, 1h, 6h, or 1d."
+        );
+      }
+
+      const url =
+        "https://api.exchange.coinbase.com/products/" +
+        encodeURIComponent(product) +
+        "/candles?granularity=" + granularity;
 
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error("Historical data unavailable (HTTP " + response.status + ").");
+        throw new Error(
+          "Coinbase historical data unavailable (HTTP " +
+          response.status + "). Try another supported coin."
+        );
       }
 
-      const candles = await response.json();
+      const rawCandles = await response.json();
 
-      if (!Array.isArray(candles) || candles.length < 100) {
-        throw new Error("Insufficient historical candles.");
+      if (!Array.isArray(rawCandles)) {
+        throw new Error("Coinbase returned invalid historical data.");
+      }
+
+      // Coinbase returns candles newest first.
+      // Convert them to the Binance-style format expected below.
+      const candles = rawCandles
+        .slice()
+        .sort((a, b) => Number(a[0]) - Number(b[0]))
+        .map(c => [
+          c[0],
+          c[3],
+          c[2],
+          c[1],
+          c[4],
+          c[5]
+        ]);
+
+      if (candles.length < 100) {
+        throw new Error(
+          "Insufficient historical candles. Try a shorter timeframe."
+        );
       }
 
       // Exclude the newest candle because it may not have closed.
       const closed = candles.slice(0, -1);
       const closes = closed.map(c => Number(c[4]));
-
       if (closes.some(p => !Number.isFinite(p) || p <= 0)) {
         throw new Error("The data contains invalid closing prices.");
       }
